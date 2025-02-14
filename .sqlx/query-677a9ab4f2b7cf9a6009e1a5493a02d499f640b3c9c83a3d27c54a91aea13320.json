@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT files.key, COALESCE(file_data.size, 0) AS \"size!\"\n        FROM files\n            LEFT JOIN file_versions ON file_versions.id = files.current_version\n            LEFT JOIN file_data ON file_data.id = file_versions.file_data_id\n        WHERE\n            files.bucket_id = $1\n            AND files.key LIKE $2\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "size!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "677a9ab4f2b7cf9a6009e1a5493a02d499f640b3c9c83a3d27c54a91aea13320"
+}

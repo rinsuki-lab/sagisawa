@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            file_versions.id as version_id,\n            file_data.id as data_id,\n            file_data.size, file_data.md5\n        FROM files\n            JOIN file_versions ON files.current_version = file_versions.id\n            JOIN file_data ON file_versions.file_data_id = file_data.id\n        WHERE\n            files.bucket_id = $1\n            AND files.key = $2\n            AND files.current_version_is_delete_marker = FALSE\n        LIMIT 1\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "version_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "data_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "size",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "md5",
+        "type_info": "Bytea"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "62a089b1b21262f61f5a86e0f5a7379424000f13d2e7be4ad78be664b3465a02"
+}

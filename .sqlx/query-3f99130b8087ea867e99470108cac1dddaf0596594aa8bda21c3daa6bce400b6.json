@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT backend_key, range FROM file_data_parts WHERE file_data_id = $1 AND range && $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "backend_key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "range",
+        "type_info": "Int8Range"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int8Range"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "3f99130b8087ea867e99470108cac1dddaf0596594aa8bda21c3daa6bce400b6"
+}

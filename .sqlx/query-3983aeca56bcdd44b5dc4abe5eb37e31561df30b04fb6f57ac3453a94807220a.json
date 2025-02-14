@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO file_data_parts(file_data_id, backend_key, range) VALUES($1, $2, $3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar",
+        "Int8Range"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3983aeca56bcdd44b5dc4abe5eb37e31561df30b04fb6f57ac3453a94807220a"
+}

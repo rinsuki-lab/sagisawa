@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO\n            files(bucket_id, key, current_version, current_version_is_delete_marker)\n        VALUES ($1, $2, -1, FALSE)\n        ON CONFLICT DO NOTHING RETURNING id\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Varchar"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "05d43f51025ff4b195dfec37eafb2eb97a03025e412678d9b4ace657b0545f95"
+}

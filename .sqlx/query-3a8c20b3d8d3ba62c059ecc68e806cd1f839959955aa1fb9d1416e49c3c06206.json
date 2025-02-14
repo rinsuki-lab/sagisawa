@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE files SET current_version = $1, current_version_is_delete_marker = FALSE WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3a8c20b3d8d3ba62c059ecc68e806cd1f839959955aa1fb9d1416e49c3c06206"
+}

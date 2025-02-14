@@ -1,0 +1,22 @@
+[package]
+name = "sagisawa"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-stream = "0.3.6"
+axum = { version = "0.8.1", features = ["macros"] }
+chrono = "0.4.39"
+futures-core = "0.3.31"
+hex = "0.4.3"
+md-5 = { version = "0.10.6", features = ["asm"] }
+quick-xml = { version = "0.37.2", features = ["serialize"] }
+reqwest = { version = "0.12.12", features = ["json"] }
+serde = { version = "1.0.217", features = ["derive"] }
+sqlx = { version = "0.8.3", features = ["postgres", "runtime-tokio", "chrono"] }
+strum = { version = "0.26.3", features = ["derive"] }
+tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread"] }
+tokio-stream = "0.1.17"
+tower-http = { version = "0.6.2", default-features = false, features = ["trace"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
