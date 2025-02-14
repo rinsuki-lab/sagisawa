@@ -1,0 +1,22 @@
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: pgpassword
+    env:
+      DATABASE_URL: postgres://postgres:pgpassword@postgres:5432/postgres
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        sparse-checkout: 'migrations/'
+    - run: cargo install sqlx-cli --no-default-features --features postgres
+    - run: sqlx migrate run
+    - run: sqlx migrate revert
+    - run: sqlx migrate run
