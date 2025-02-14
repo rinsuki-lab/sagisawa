@@ -48,7 +48,7 @@ jobs:
         tags:
           type=ref,event=branch
     - run: |
-        skopeo copy --override-os linux --override-arch amd64 oci-archive:./images/amd64/image.tar docker-registry:sagisawa:amd64
-        skopeo copy --override-os linux --override-arch arm64 --override-variant v8 oci-archive:./images/arm64/image.tar docker-registry:sagisawa:arm64
-    - run: skopeo inspect docker://docker-registry:sagisawa:amd64
-    - run: skopeo inspect docker://docker-registry:sagisawa:arm64
+        skopeo copy --override-os linux --override-arch amd64 oci-archive:./images/amd64/image.tar docker-daemon:sagisawa:amd64
+        skopeo copy --override-os linux --override-arch arm64 --override-variant v8 oci-archive:./images/arm64/image.tar docker-daemon:sagisawa:arm64
+    - run: skopeo inspect docker-daemon:sagisawa:amd64
+    - run: skopeo inspect docker-daemon:sagisawa:arm64
