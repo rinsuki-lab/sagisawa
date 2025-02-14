@@ -8,18 +8,35 @@ jobs:
   build:
     strategy:
       matrix:
-        runs-on:
-          - ubuntu-24.04
-          - ubuntu-24.04-arm
-    runs-on: ${{ matrix.runs-on }}
+        include:
+          - image: ubuntu-24.04
+            arch: amd64
+          - image: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.image }}
     steps:
-    - uses: actions/checkout@v4
     - uses: docker/setup-buildx-action@v3
+    - uses: docker/login-action@v3
+      if: github.event_name != 'pull_request'
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Extract metadata for sub-image
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}/ci-temp
+        flavor: suffix=.arch.${{ matrix.arch }}
+        tags: |
+          type=raw,value=run.${{ github.run_id }}
     - uses: docker/build-push-action@v6
       with:
+        push: ${{ github.event_name != 'pull_request' }}
         provenance: mode=max
         sbom: true
-        outputs: type=oci,dest=./image.tar
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
     - uses: actions/upload-artifact@v4
       with:
         name: image-${{ matrix.runs-on }}
@@ -27,28 +44,10 @@ jobs:
   merge:
     runs-on: ubuntu-24.04
     needs: build
+    if: github.event_name != 'pull_request'
     steps:
-    - uses: actions/download-artifact@v4
-      with:
-        name: image-ubuntu-24.04
-        path: ./images/amd64
-    - uses: actions/download-artifact@v4
-      with:
-        name: image-ubuntu-24.04-arm
-        path: ./images/arm64
-    - run: find .
-    - uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
     - uses: docker/metadata-action@v3
       with:
         images: ghcr.io/${{ github.repository }}
         tags:
           type=ref,event=branch
-    - run: |
-        skopeo copy --override-os linux --override-arch amd64 oci-archive:./images/amd64/image.tar docker-daemon:sagisawa:amd64
-        skopeo copy --override-os linux --override-arch arm64 --override-variant v8 oci-archive:./images/arm64/image.tar docker-daemon:sagisawa:arm64
-    - run: docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") -t sagisawa:merged sagisawa:amd64 sagisawa:arm64
-    - run: docker buildx imagetools inspect sagisawa:merged
