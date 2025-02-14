@@ -35,16 +35,18 @@ jobs:
         tags: |
           type=raw,value=run.${{ github.run_id }}
     - uses: docker/build-push-action@v6
+      id: push
       with:
         push: ${{ github.event_name != 'pull_request' }}
         provenance: mode=max
         sbom: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-    - uses: actions/upload-artifact@v4
+    - uses: actions/attest-build-provenance@v2
       with:
-        name: image-${{ matrix.runs-on }}
-        path: ./image.tar
+        subject-name: ghcr.io/${{ github.repository }}/ci-temp
+        subject-digest: ${{ steps.push.outputs.digest }}
+        push-to-registry: ${{ github.event_name != 'pull_request' }}
   merge:
     runs-on: ubuntu-24.04
     needs: build
