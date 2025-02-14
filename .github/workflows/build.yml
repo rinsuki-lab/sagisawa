@@ -17,7 +17,7 @@ jobs:
       with:
         provenance: mode=max
         sbom: true
-        outputs: type=oci,dest=./image.tar
+        outputs: type=docker,dest=./image.tar
     - uses: actions/upload-artifact@v4
       with:
         name: image-${{ matrix.runs-on }}
@@ -29,11 +29,11 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         name: image-ubuntu-24.04
-        path: ./image-x64.tar
+        path: ./images/amd64
     - uses: actions/download-artifact@v4
       with:
         name: image-ubuntu-24.04-arm
-        path: ./image-arm64.tar
+        path: ./images/arm64
     - run: find .
     - uses: docker/login-action@v3
       with:
@@ -45,3 +45,8 @@ jobs:
         images: ghcr.io/${{ github.repository }}
         tags:
           type=ref,event=branch
+    - run: |
+        skopeo copy --override-os linux --override-arch amd64 oci-archive:./images/amd64/image.tar docker-registry:sagisawa:amd64
+        skopeo copy --override-os linux --override-arch arm64 --override-variant v8 oci-archive:./images/arm64/image.tar docker-registry:sagisawa:arm64
+    - run: skopeo inspect docker://docker-registry:sagisawa:amd64
+    - run: skopeo inspect docker://docker-registry:sagisawa:arm64
