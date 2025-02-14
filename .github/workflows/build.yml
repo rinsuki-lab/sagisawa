@@ -50,5 +50,5 @@ jobs:
     - run: |
         skopeo copy --override-os linux --override-arch amd64 oci-archive:./images/amd64/image.tar docker-daemon:sagisawa:amd64
         skopeo copy --override-os linux --override-arch arm64 --override-variant v8 oci-archive:./images/arm64/image.tar docker-daemon:sagisawa:arm64
-    - run: skopeo inspect docker-daemon:sagisawa:amd64
-    - run: skopeo inspect docker-daemon:sagisawa:arm64
+    - run: docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") -t sagisawa:merged sagisawa:amd64 sagisawa:arm64
+    - run: docker buildx imagetools inspect sagisawa:merged
