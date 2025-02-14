@@ -9,6 +9,7 @@ jobs:
     permissions:
       id-token: write
       attestations: write
+      packages: write
     strategy:
       matrix:
         include:
