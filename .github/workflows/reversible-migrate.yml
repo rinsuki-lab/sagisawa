@@ -1,3 +1,5 @@
+name: Reversible Migrate Check
+
 on:
   push:
   pull_request:
