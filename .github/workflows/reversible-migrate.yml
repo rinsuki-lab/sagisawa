@@ -10,8 +10,10 @@ jobs:
         image: postgres:17
         env:
           POSTGRES_PASSWORD: pgpassword
+        ports:
+        - 5432:5432
     env:
-      DATABASE_URL: postgres://postgres:pgpassword@postgres:5432/postgres
+      DATABASE_URL: postgres://postgres:pgpassword@localhost:5432/postgres
     steps:
     - uses: actions/checkout@v4
       with:
