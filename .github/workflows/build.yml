@@ -75,6 +75,8 @@ jobs:
         images: ghcr.io/${{ github.repository }}
         tags:
           type=ref,event=branch
+      env:
+        DOCKER_METADATA_ANNOTATIONS_LEVELS: index
     - uses: docker/login-action@v3
       with:
         registry: ghcr.io
@@ -94,7 +96,7 @@ jobs:
           "docker", "buildx", "imagetools", "create",
           "--progress", "rawjson",
           *sum([["-t", tag] for tag in metadata['tags']], []),
-          # *sum([["--annotation", annotation] for annotation in metadata['annotations']], []),
+          *sum([["--annotation", annotation] for annotation in metadata['annotations']], []),
           *sum([["ghcr.io/${{ github.repository }}@sha256:" + digest] for digest in os.listdir()], []),
         ])
     # - uses: actions/attest-build-provenance@v2
