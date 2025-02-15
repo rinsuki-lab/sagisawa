@@ -41,6 +41,7 @@ jobs:
         provenance: mode=max
         sbom: true
         labels: ${{ steps.meta.outputs.labels }}
+        annotations: ${{ steps.meta.outputs.annotations }}
         outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true
     - name: Export digest
       run: |
@@ -83,5 +84,11 @@ jobs:
     - name: Create manifest list and push
       working-directory: ${{ runner.temp }}/digests
       run: |
-        docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+        docker buildx imagetools create --progress rawjson \
+          $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+          $(jq -cr '.annotations | map("--annotation " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
           $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+    # - uses: actions/attest-build-provenance@v2
+    #   with:
+    #     subject-name: ghcr.io/${{ github.repository }}
+    #     subject-digest: 
