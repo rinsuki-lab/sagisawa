@@ -56,7 +56,7 @@ jobs:
         retention-days: 1
     - uses: actions/attest-build-provenance@v2
       with:
-        subject-name: ghcr.io/${{ github.repository }}/ci-temp
+        subject-name: ghcr.io/${{ github.repository }}
         subject-digest: ${{ steps.push.outputs.digest }}
         push-to-registry: ${{ github.event_name != 'pull_request' }}
   merge:
