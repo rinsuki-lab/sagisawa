@@ -84,6 +84,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Create manifest list and push
       working-directory: ${{ runner.temp }}/digests
+      id: push
       run: |
         set -x
         args=()
@@ -100,8 +101,10 @@ jobs:
           args+=("ghcr.io/${{ github.repository }}@sha256:$digest")
         done
 
-        docker buildx imagetools create "${args[@]}" | tee imagetools.create.log
-    # - uses: actions/attest-build-provenance@v2
-    #   with:
-    #     subject-name: ghcr.io/${{ github.repository }}
-    #     subject-digest: 
+        docker buildx imagetools create "${args[@]}" | tee ${{ runner.temp }}/imagetools.create.log
+        echo "digest=$(sed -nE 's/.*pushing (sha256:[0-9a-f]{64}) to .*/\1/p' ${{ runner.temp }}/imagetools.create.log)" >> $GITHUB_OUTPUT
+    - uses: actions/attest-build-provenance@v2
+      with:
+        subject-name: ghcr.io/${{ github.repository }}
+        subject-digest: ${{ steps.push.outputs.digest }}
+        push-to-registry: true
