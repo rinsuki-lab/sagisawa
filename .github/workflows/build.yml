@@ -70,7 +70,7 @@ jobs:
         path: ${{ runner.temp }}/digests
         pattern: digests-*
         merge-multiple: true
-    - uses: docker/metadata-action@v3
+    - uses: docker/metadata-action@v5
       with:
         images: ghcr.io/${{ github.repository }}
         tags:
