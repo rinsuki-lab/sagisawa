@@ -100,7 +100,7 @@ jobs:
           args+=("ghcr.io/${{ github.repository }}@sha256:$digest")
         done
 
-        docker buildx imagetools create --progress rawjson "${args[@]}"
+        docker buildx imagetools create "${args[@]}"
     # - uses: actions/attest-build-provenance@v2
     #   with:
     #     subject-name: ghcr.io/${{ github.repository }}
