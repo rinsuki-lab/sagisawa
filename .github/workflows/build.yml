@@ -95,7 +95,7 @@ jobs:
           "docker", "buildx", "imagetools", "create",
           "--progress", "rawjson",
           *sum([["-t", tag] for tag in metadata['tags']], []),
-          *sum([["--annotation", annotation] for annotation in metadata['annotations']], []),
+          # *sum([["--annotation", annotation] for annotation in metadata['annotations']], []),
           *sum([["ghcr.io/${{ github.repository }}@sha256:" + digest] for digest in os.listdir()], []),
         ])
     # - uses: actions/attest-build-provenance@v2
