@@ -83,11 +83,21 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Create manifest list and push
       working-directory: ${{ runner.temp }}/digests
+      shell: python
       run: |
-        docker buildx imagetools create --progress rawjson \
-          $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-          $(jq -cr '.annotations | map("--annotation " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-          $(printf 'ghcr.io/${{ github.repository }}@sha256:%s ' *)
+        import subprocess
+        import os
+        import json
+
+        metadata = json.loads(os.environ['DOCKER_METADATA_OUTPUT_JSON'])
+
+        subprocess.run([
+          "docker", "buildx", "imagetools", "create",
+          "--progress", "rawjson",
+          *sum([["-t", tag] for tag in metadata['tags']], []),
+          *sum([["--annotation", annotation] for annotation in metadata['annotations']], []),
+          *sum([["ghcr.io/${{ github.repository }}@sha256:" + digest] for digest in os.listdir()], []),
+        ])
     # - uses: actions/attest-build-provenance@v2
     #   with:
     #     subject-name: ghcr.io/${{ github.repository }}
