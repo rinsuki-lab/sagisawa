@@ -85,6 +85,7 @@ jobs:
     - name: Create manifest list and push
       working-directory: ${{ runner.temp }}/digests
       run: |
+        set -x
         args=()
 
         while IFS= read -r tag; do
@@ -99,7 +100,7 @@ jobs:
           args+=("ghcr.io/${{ github.repository }}@sha256:$digest")
         done
 
-        docker buildx imagetools create --progress rawjson "${args[@]}"
+        docker buildx imagetools create --progress rawjson "${args[@]}" | tee create.log.json
     # - uses: actions/attest-build-provenance@v2
     #   with:
     #     subject-name: ghcr.io/${{ github.repository }}
