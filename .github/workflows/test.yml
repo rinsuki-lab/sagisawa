@@ -1,11 +1,11 @@
-name: Reversible Migrate Check
+name: Test
 
 on:
   push:
   pull_request:
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -22,5 +22,8 @@ jobs:
         sparse-checkout: 'migrations/'
     - run: cargo install sqlx-cli --no-default-features --features postgres
     - run: sqlx migrate run
+    - run: cargo run &
+    - run: killall sagisawa
+    - run: fg
     - run: sqlx migrate revert
     - run: sqlx migrate run
