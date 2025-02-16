@@ -21,8 +21,9 @@ jobs:
     - working-directory: ${{ runner.temp }}
       run: |
         wget https://github.com/mozilla/sccache/releases/download/v0.9.1/sccache-v0.9.1-x86_64-unknown-linux-musl.tar.gz{,.sha256}
-        sha256sum -c sccache-v0.9.1-x86_64-unknown-linux-musl.tar.gz.sha256
+        sha256sum -c - <<< "$(cat sccache-v0.9.1-x86_64-unknown-linux-musl.tar.gz.sha256) sccache-v0.9.1-x86_64-unknown-linux-musl.tar.gz"
         tar xzf sccache-v0.9.1-x86_64-unknown-linux-musl.tar.gz
+        echo "RUSTC_WRAPPER=$PWD/sccache" >> $GITHUB_ENV
     - run: cargo install sqlx-cli --no-default-features --features postgres --debug
     - run: sqlx migrate run
     - run: cargo build
