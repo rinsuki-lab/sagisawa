@@ -30,6 +30,5 @@ jobs:
     - run: cargo build
     - run: cargo run &
     - run: killall sagisawa
-    - run: fg
     - run: sqlx migrate revert
     - run: sqlx migrate run
