@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17
@@ -18,8 +18,6 @@ jobs:
       DATABASE_URL: postgres://postgres:pgpassword@localhost:5432/postgres
     steps:
     - uses: actions/checkout@v4
-      with:
-        sparse-checkout: 'migrations/'
     - run: cargo install sqlx-cli --no-default-features --features postgres
     - run: sqlx migrate run
     - run: cargo run &
