@@ -18,7 +18,12 @@ jobs:
       DATABASE_URL: postgres://postgres:pgpassword@localhost:5432/postgres
     steps:
     - uses: actions/checkout@v4
-    - run: cargo install sqlx-cli --no-default-features --features postgres
+    - working-directory: ${{ runner.temp }}
+      run: |
+        wget https://github.com/mozilla/sccache/releases/download/v0.9.1/sccache-v0.9.1-x86_64-unknown-linux-musl.tar.gz{,.sha256}
+        sha256sum -c sccache-v0.9.1-x86_64-unknown-linux-musl.tar.gz.sha256
+        tar xzf sccache-v0.9.1-x86_64-unknown-linux-musl.tar.gz
+    - run: cargo install sqlx-cli --no-default-features --features postgres --debug
     - run: sqlx migrate run
     - run: cargo build
     - run: cargo run &
