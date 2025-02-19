@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-24.04
     services:
       postgres:
-        image: postgres:17
+        image: postgres:16
         env:
           POSTGRES_PASSWORD: pgpassword
         ports:
@@ -34,5 +34,5 @@ jobs:
     - run: sqlx migrate run
     - name: Verify Current SQL is Up to Date
       run: |
-        docker run --rm -v $(pwd):/app --net host -e DATABASE_URL=$DATABASE_URL postgres:17 bash -c "cd /app && ./update-current-schema.sh"
+        docker run --rm -v $(pwd):/app --net host -e DATABASE_URL=$DATABASE_URL postgres:16 bash -c "cd /app && ./update-current-schema.sh"
         git diff --exit-code
