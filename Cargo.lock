@@ -1609,6 +1609,7 @@ dependencies = [
  "quick-xml",
  "reqwest",
  "serde",
+ "sha2",
  "sqlx",
  "strum",
  "tokio",

@@ -69,21 +69,39 @@ pub async fn put_object(
             };
 
             let part_id = sqlx::query!(
-                "INSERT INTO file_data_parts(file_data_id, backend_key, range) VALUES($1, $2, $3)",
+                "INSERT INTO file_data_parts(file_data_id, backend_key, range) VALUES($1, $2, $3) RETURNING id",
                 data_id,
                 result.r#ref,
                 PgRange::from(0..(result.size as i64))
             )
-            .execute(&mut *tx)
+            .fetch_one(&mut *tx)
             .await;
 
-            match part_id {
-                Ok(_) => (),
+            let part_id = match part_id {
+                Ok(rec) => rec.id,
                 Err(e) => {
                     tracing::error!("Failed to insert file data part: {:?}", e);
                     return S3Error::InternalError.into_response();
                 }
             };
+
+            let mut builder = sqlx::QueryBuilder::new(
+                "INSERT INTO file_data_part_chunk_info (part_id, range, md5, sha256) ",
+            );
+
+            builder.push_values(result.chunks, |mut b, chunk| {
+                b.push_bind(part_id)
+                    .push_bind(PgRange::from(chunk.range.clone()))
+                    .push_bind(chunk.md5.clone())
+                    .push_bind(chunk.sha256.clone());
+            });
+
+            let insert_chunk = builder.build().execute(&mut *tx).await;
+
+            if let Err(e) = insert_chunk {
+                tracing::error!("Failed to insert chunk info: {:?}", e);
+                return S3Error::InternalError.into_response();
+            }
 
             Some(data_id)
         }

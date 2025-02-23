@@ -13,6 +13,7 @@ md-5 = { version = "0.10.6", features = ["asm"] }
 quick-xml = { version = "0.37.2", features = ["serialize"] }
 reqwest = { version = "0.12.12", features = ["json"] }
 serde = { version = "1.0.217", features = ["derive"] }
+sha2 = "0.10.8"
 sqlx = { version = "0.8.3", features = ["postgres", "runtime-tokio", "chrono"] }
 strum = { version = "0.26.3", features = ["derive"] }
 tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread"] }

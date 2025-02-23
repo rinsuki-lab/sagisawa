@@ -3,6 +3,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use md5::Digest;
+use sha2::Sha256;
 use sqlx::PgTransaction;
 use tokio_stream::StreamExt;
 
@@ -25,10 +26,17 @@ struct UploadFinalizeResponse {
     r#ref: String,
 }
 
+pub struct ChunkInfo {
+    pub range: std::ops::Range<i64>,
+    pub md5: [u8; 16],
+    pub sha256: [u8; 32],
+}
+
 pub struct UploadResult {
     pub r#ref: String,
     pub md5: [u8; 16],
     pub size: u64,
+    pub chunks: Vec<ChunkInfo>,
 }
 
 #[tracing::instrument(skip(client, session, bytes), fields())]
@@ -130,6 +138,7 @@ pub async fn upload_from_stream(
 
     let mut current = first;
     let mut offset = 0;
+    let mut all_chunks: Vec<ChunkInfo> = Vec::new();
     let mut hasher = md5::Md5::new();
     loop {
         if (buf.len() + current.len()) > session.chunk_size {
@@ -142,6 +151,13 @@ pub async fn upload_from_stream(
                 offset
             );
             hasher.update(&buf);
+            let chunk_md5 = md5::Md5::digest(&buf);
+            let chunk_sha256 = Sha256::digest(&buf);
+            all_chunks.push(ChunkInfo {
+                range: (offset as i64)..(offset as i64) + (buf.len() as i64),
+                md5: chunk_md5.into(),
+                sha256: chunk_sha256.into(),
+            });
             upload_chunk(&client, &session, offset, &buf).await?;
             offset += buf.len() as u64;
             current = Bytes::from(current[available..].to_vec());
@@ -216,6 +232,7 @@ pub async fn upload_from_stream(
             r#ref: v.r#ref,
             md5: hasher.into(),
             size: offset,
+            chunks: all_chunks,
         })),
         Err(e) => {
             tracing::error!("Failed to parse session finish response: {:?}", e);
